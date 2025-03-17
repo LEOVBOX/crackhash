@@ -9,5 +9,4 @@ public class CrackhashApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CrackhashApplication.class, args);
 	}
-
 }
