@@ -1,4 +1,4 @@
-package leovbox.crackhash.requeset;
+package leovbox.crackhash.requests;
 
 
 public class CrackRequest {

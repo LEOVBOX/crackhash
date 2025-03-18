@@ -1,4 +1,4 @@
-package leovbox.crackhash_worker.requests;
+package leovbox.crackhash.requests;
 
 import java.util.stream.IntStream;
 
@@ -35,6 +35,14 @@ public class TaskRequest {
 
     /// Идентификатор задачи, сгенерированный на менеджере.
     private String taskId;
+
+//    public String getAlphabet() {
+//        return alphabet;
+//    }
+
+//    public void setAlphabet(String alphabet) {
+//        this.alphabet = alphabet;
+//    }
 
     public int getPartNumber() {
         return partNumber;

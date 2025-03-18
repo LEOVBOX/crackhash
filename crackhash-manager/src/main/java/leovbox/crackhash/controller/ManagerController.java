@@ -1,8 +1,8 @@
 package leovbox.crackhash.controller;
 
 import io.micrometer.common.lang.Nullable;
-import leovbox.crackhash.requeset.CrackRequest;
-import leovbox.crackhash.requeset.RequestIdGenerator;
+import leovbox.crackhash.requests.CrackRequest;
+import leovbox.crackhash.requests.RequestIdGenerator;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

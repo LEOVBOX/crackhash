@@ -4,6 +4,7 @@ import leovbox.crackhash_worker.models.TaskStatus;
 import leovbox.crackhash_worker.requests.TaskRequest;
 import org.paukov.combinatorics.ICombinatoricsVector;
 import org.paukov.combinatorics.*;
+import org.springframework.scheduling.config.Task;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
@@ -22,7 +23,6 @@ import static org.paukov.combinatorics.CombinatoricsFactory.createVector;
 @Service
 /// Сервис для перебора перестановок и нахождения значения хэш кода
 public class BrutForceService {
-    // TODO: Использовать как сервис внутри TaskService
 
     private final ConcurrentHashMap<String, TaskStatus> tasks = new ConcurrentHashMap<>();
 
@@ -85,10 +85,10 @@ public class BrutForceService {
         return tasks.get(taskId);
     }
 
-    public CompletableFuture<Void> startBrutForceAsync(TaskRequest request) {
+    public CompletableFuture<Void> startBrutForceAsync(TaskRequest request, TaskStatus taskStatus) {
         // Создаем новую задачу и добавляем её в ConcurrentHashMap
-        TaskStatus taskStatus = new TaskStatus("IN_PROGRESS", new ArrayList<>());
-        tasks.put(request.getTaskId(), taskStatus);
+//        TaskStatus taskStatus = new TaskStatus("IN_PROGRESS", new ArrayList<>());
+//        tasks.put(request.getTaskId(), taskStatus);
 
         // Запускаем асинхронное выполнение
         return CompletableFuture.runAsync(() -> {

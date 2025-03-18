@@ -28,6 +28,8 @@ public class WorkerController {
 
         taskService.startTask(request);
 
+        System.out.println(request.getTaskId());
+
         //List<String> result = BrutForceService.BrutForce(request);
 
         //System.out.println(result);
@@ -36,9 +38,9 @@ public class WorkerController {
     }
 
     /// Метод для обработки GET запроса на получение статуса отправленной задачи
-//    @GetMapping("/status")
-//    public ResponseEntity<TaskStatus> getStatus(@RequestParam String taskId) {
-//        TaskStatus status = TaskService.getTaskStatus(taskId);
-//        return ResponseEntity.ok(status);
-//    }
+    @GetMapping("/status")
+    public ResponseEntity<TaskStatus> getStatus(@RequestParam String taskId) {
+        TaskStatus status = taskService.getTaskStatus(taskId);
+        return ResponseEntity.ok(status);
+    }
 }

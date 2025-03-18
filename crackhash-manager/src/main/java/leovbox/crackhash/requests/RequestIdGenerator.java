@@ -1,4 +1,4 @@
-package leovbox.crackhash.requeset;
+package leovbox.crackhash.requests;
 
 import java.util.UUID;
 
