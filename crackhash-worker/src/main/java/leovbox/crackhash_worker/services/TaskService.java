@@ -1,7 +1,9 @@
 package leovbox.crackhash_worker.services;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import leovbox.crackhash_worker.models.TaskStatus;
 import leovbox.crackhash_worker.requests.TaskRequest;
+import leovbox.crackhash_worker.responses.CrackTaskResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -74,16 +76,28 @@ public class TaskService {
     private void sendResultToManager(String taskId, TaskStatus status) {
         String url = managerUrl + "/internal/api/manager/hash/crack/request";
 
+        CrackTaskResponse response = new CrackTaskResponse();
+        response.setData(status.getResult());
+        response.setRequestId(taskId);
+//        response.setStatus(status.getStatus());
+
+        try {
+            String requestBody = new ObjectMapper().writeValueAsString(response);
+            System.out.println("Sending request to Manager: " + requestBody);
+        } catch (Exception e) {
+            System.err.println("Failed to serialize request body: " + e.getMessage());
+        }
+
         // Создаем заголовки запроса
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
         // Создаем тело запроса (в данном случае это TaskStatus)
-        HttpEntity<TaskStatus> requestEntity = new HttpEntity<>(status, headers);
+        HttpEntity<CrackTaskResponse> requestEntity = new HttpEntity<>(response, headers);
 
-        // Отправляем POST-запрос на Manager
+        // Отправляем PATCH-запрос на Manager
         try {
-            restTemplate.exchange(managerUrl, HttpMethod.POST, requestEntity, Void.class);
+            restTemplate.exchange(url, HttpMethod.POST, requestEntity, Void.class);
             System.out.println("Result sent to Manager for task: " + taskId);
         } catch (Exception e) {
             System.err.println("Failed to send result to Manager: " + e.getMessage());

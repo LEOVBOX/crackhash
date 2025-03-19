@@ -24,17 +24,9 @@ public class WorkerController {
     ///  Метод для обработки POST запроса на перебор указанной части (partNumber) перестановок
     @PostMapping("/hash/crack/task")
     public ResponseEntity<String> postTask(@RequestBody TaskRequest request) {
-        // TODO: Написать вызов метода для перебора перестановок
-
         taskService.startTask(request);
 
-        System.out.println(request.getTaskId());
-
-        //List<String> result = BrutForceService.BrutForce(request);
-
-        //System.out.println(result);
-
-        return ResponseEntity.ok().body("Task started");
+        return ResponseEntity.ok().body("Task started" + request.getTaskId());
     }
 
     /// Метод для обработки GET запроса на получение статуса отправленной задачи

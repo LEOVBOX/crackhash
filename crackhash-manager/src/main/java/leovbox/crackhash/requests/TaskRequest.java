@@ -6,21 +6,14 @@ public class TaskRequest {
     ///  Алфавит, доступный для составления слов посредством перестановок.
     //private String alphabet;
 
-    private Character[] alphabet;
+    private String alphabet;
 
-    public void setAlphabet(Character[] alphabet) {
-        this.alphabet = alphabet;
-    }
-
-    public Character[] getAlphabet() {
+    public String getAlphabet() {
         return this.alphabet;
     }
 
-    public void setAlphabet(String alphabetString) {
-        char[] alphabetArray = alphabetString.toCharArray();
-        this.alphabet = IntStream.range(0, alphabetArray.length)
-                .mapToObj(i -> alphabetArray[i])
-                .toArray(Character[]::new);
+    public void setAlphabet(String alphabet) {
+        this.alphabet = alphabet;
     }
 
     ///  Порядковый номер части, которую нужно перебрать воркеру.
@@ -35,14 +28,6 @@ public class TaskRequest {
 
     /// Идентификатор задачи, сгенерированный на менеджере.
     private String taskId;
-
-//    public String getAlphabet() {
-//        return alphabet;
-//    }
-
-//    public void setAlphabet(String alphabet) {
-//        this.alphabet = alphabet;
-//    }
 
     public int getPartNumber() {
         return partNumber;

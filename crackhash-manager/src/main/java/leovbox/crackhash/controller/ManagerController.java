@@ -1,73 +1,83 @@
 package leovbox.crackhash.controller;
 
-import io.micrometer.common.lang.Nullable;
+import leovbox.crackhash.models.TaskStatus;
 import leovbox.crackhash.requests.CrackRequest;
-import leovbox.crackhash.requests.RequestIdGenerator;
+import leovbox.crackhash.requests.TaskResult;
+import leovbox.crackhash.services.TaskCompletionService;
+import leovbox.crackhash.services.TaskStorageService;
+import leovbox.crackhash.services.WorkerClientService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.UUID;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/hash")
 public class ManagerController {
+    private final WorkerClientService workerClientService;
+    private final TaskStorageService taskStorageService;
+    private final TaskCompletionService taskCompletionService;
 
-    enum Status {
-        IN_PROGRESS, ERROR, READY
-    }
-    HashMap<String, Status> requests = new HashMap<>();
-
-    public ManagerController() {
-        requests.put("Gouda", Status.IN_PROGRESS);
-    }
-    public boolean isActive = false;
-    public String name = "Worker1";
-
-    private UUID createNewTask(CrackRequest crackRequest) {
-
-        // TODO: Написать логику создания таски, проверки условий и тд
-        UUID requestId = RequestIdGenerator.generateRequestId();
-        requests.put(requestId.toString(), Status.IN_PROGRESS);
-        return requestId;
+    @Autowired
+    public ManagerController(WorkerClientService workerClientService,
+                             TaskStorageService taskStorageService,
+                             TaskCompletionService taskCompletionService) {
+        this.workerClientService = workerClientService;
+        this.taskStorageService = taskStorageService;
+        this.taskCompletionService = taskCompletionService;
     }
 
+    /**
+     * Обрабатывает запрос на взлом хэша.
+     *
+     * @param crackRequest Запрос на взлом хэша.
+     * @return Идентификатор задачи.
+     */
     @PostMapping("/crack")
     public ResponseEntity<?> crack(@RequestBody CrackRequest crackRequest) {
-        if (crackRequest == null) {
+        if (crackRequest == null || crackRequest.getHash() == null || crackRequest.getHash().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(new ErrorResponse("Хэш не может быть пустым"));
         }
 
-        UUID RequestId = createNewTask(crackRequest);
+        // Создаем новую задачу
+        String taskId = taskStorageService.createTask(taskCompletionService.getWorkersCount());
 
-        return ResponseEntity.ok(RequestId.toString());
+        // Запускаем выполнение задачи асинхронно
+        taskCompletionService.executeTaskAsync(taskId, crackRequest);
+
+        // Возвращаем идентификатор задачи
+        return ResponseEntity.ok(taskId);
     }
 
-    @GetMapping("/status") ResponseEntity<?> status(String requestId) {
-        return ResponseEntity.ok(new StatusResponseDTO(requests.get(requestId).toString(), null));
+    /**
+     * Возвращает статус задачи.
+     *
+     * @param requestId Идентификатор задачи.
+     * @return Статус задачи и результат (если готов).
+     */
+    @GetMapping("/status")
+    public ResponseEntity<?> status(@RequestParam String requestId) {
+        TaskStatus statusResponse = taskStorageService.getTaskStatus(requestId);
+        if (statusResponse == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Задача с ID " + requestId + " не найдена"));
+        }
+        return ResponseEntity.ok(statusResponse);
     }
-}
-
-class StatusRequest {
 
 }
 
 class ErrorResponse {
     private String message;
-    public ErrorResponse(String message) { this.message = message; }
-    public String getMessage() { return message; }
-}
 
-class StatusResponseDTO {
-    private String status;
-    @Nullable
-    private ArrayList<String> result;
+    public ErrorResponse(String message) {
+        this.message = message;
+    }
 
-    public StatusResponseDTO(String status, ArrayList<String> result) { this.status = status; }
-    public String getStatus() { return status; }
-
-    public ArrayList<String> getResult() { return result; }
+    public String getMessage() {
+        return message;
+    }
 }

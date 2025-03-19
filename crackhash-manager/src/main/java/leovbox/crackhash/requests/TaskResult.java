@@ -1,10 +1,14 @@
-package leovbox.crackhash_worker.responses;
+package leovbox.crackhash.requests;
 
+import leovbox.crackhash.models.Status;
+
+import java.util.ArrayList;
 import java.util.List;
 
-public class CrackTaskResponse {
+public class TaskResult {
     private String requestId; // Идентификатор задачи
-    private List<String> data; // Результат (найденные слова)
+    private List<String> data; // Результат выполнения задачи
+//    private Status status;
 
     // Геттеры и сеттеры
     public String getRequestId() {
@@ -23,11 +27,11 @@ public class CrackTaskResponse {
         this.data = data;
     }
 
-//    public String getStatus() {
+//    public Status getStatus() {
 //        return status;
 //    }
 //
-//    public void setStatus(String status) {
+//    public void setStatus(Status status) {
 //        this.status = status;
 //    }
 }

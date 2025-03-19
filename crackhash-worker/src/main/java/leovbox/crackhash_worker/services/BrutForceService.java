@@ -73,7 +73,8 @@ public class BrutForceService {
                 List<Character> word = combination.getVector();
 
                 if (calculateMD5(word).equals(request.getHash())) {
-                    result.add(word.toString());
+                    result.add(convertToString(word));
+                    System.out.println("result added " + convertToString(word));
                 }
             }
         }
@@ -83,6 +84,14 @@ public class BrutForceService {
 
     public TaskStatus getTaskStatus(String taskId) {
         return tasks.get(taskId);
+    }
+
+    public static String convertToString(List<Character> charList) {
+        StringBuilder sb = new StringBuilder();
+        for (Character ch : charList) {
+            sb.append(ch);
+        }
+        return sb.toString();
     }
 
     public CompletableFuture<Void> startBrutForceAsync(TaskRequest request, TaskStatus taskStatus) {
