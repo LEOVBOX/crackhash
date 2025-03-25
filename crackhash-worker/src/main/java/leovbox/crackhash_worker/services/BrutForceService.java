@@ -78,6 +78,7 @@ public class BrutForceService {
                 }
             }
         }
+        System.out.println("brutForce " + request.getTaskId() + " ended");
 
         return result;
     }

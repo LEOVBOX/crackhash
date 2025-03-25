@@ -25,6 +25,7 @@ public class InternalController {
      */
     @PostMapping("/request")
     public ResponseEntity<?> updateTask(@RequestBody TaskResult taskResult) {
+        System.out.println("updateTask " + taskResult.getRequestId() + taskResult.getData());
         String requestId = taskResult.getRequestId();
         List<String> data = taskResult.getData();
 

@@ -1,6 +1,7 @@
 package leovbox.crackhash.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import leovbox.crackhash.requests.CrackRequest;
 import leovbox.crackhash.requests.TaskRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,11 @@ public class WorkerClientService {
 
     @Value("${worker.urls}")
     private List<String> workerUrls;
+
+    @PostConstruct
+    public void printWorkerUrls() {
+        System.out.println("WorkerClientService: WORKER_URLS from application.properties: " + workerUrls);
+    }
 
     @Autowired
     public WorkerClientService(RestTemplate restTemplate) {

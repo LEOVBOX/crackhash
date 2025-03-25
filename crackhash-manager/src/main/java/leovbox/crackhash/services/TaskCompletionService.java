@@ -1,5 +1,6 @@
 package leovbox.crackhash.services;
 
+import jakarta.annotation.PostConstruct;
 import leovbox.crackhash.models.Status;
 import leovbox.crackhash.requests.CrackRequest;
 import org.springframework.scheduling.annotation.Async;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class TaskCompletionService {
@@ -24,12 +26,23 @@ public class TaskCompletionService {
     @Value("${worker.urls}")
     private List<String> workerUrls;
 
+    @PostConstruct
+    public void printWorkerUrls() {
+        System.out.println("WORKER_URLS from application.properties: " + workerUrls);
+    }
+
     public int getWorkersCount() {
         return workerUrls.size();
     }
 
     @Value("${timeout.ms}")
     private int timeout;
+
+    @PostConstruct
+    public void printTimout() {
+        System.out.println("Timeout = " + timeout);
+
+    }
 
     @Autowired
     public TaskCompletionService(TaskStorageService taskStorageService, RestTemplate restTemplate,
@@ -46,25 +59,29 @@ public class TaskCompletionService {
      * @return Результаты выполнения задачи.
      */
     @Async
-    public void executeTaskAsync(String taskId, CrackRequest crackRequest) {
-        try {
-            // Отправляем задачи всем Worker'ам
-            workerClientService.sendTasksToWorkers(crackRequest, taskId);
+    public CompletableFuture<Void> executeTaskAsync(String taskId, CrackRequest crackRequest) {
+        return CompletableFuture.runAsync(() -> {
+            try {
+                // Отправляем задачи всем Worker'ам
+                workerClientService.sendTasksToWorkers(crackRequest, taskId);
 
-            // Ожидаем завершения задачи с таймаутом (например, 60 секунд)
-            long startTime = System.currentTimeMillis();
-            while (!taskStorageService.isTaskCompleted(taskId)) {
-                if (System.currentTimeMillis() - startTime > timeout) { // Таймаут 60 секунд
-                    taskStorageService.updateStatus(taskId, Status.ERROR);
-                    break;
+                // Ожидаем завершения задачи с таймаутом (например, 60 секунд)
+                long startTime = System.currentTimeMillis();
+                while (!taskStorageService.isTaskCompleted(taskId)) {
+                    if (System.currentTimeMillis() - startTime > timeout) { // Таймаут 60 секунд
+                        taskStorageService.updateStatus(taskId, Status.ERROR);
+                        System.out.println(taskId + "timeout");
+                        break;
+                    }
+                    Thread.sleep(1000); // Ждем 1 секунду
                 }
-                Thread.sleep(timeout); // Ждем 1 секунду
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                taskStorageService.updateStatus(taskId, Status.ERROR);
             }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            taskStorageService.updateStatus(taskId, Status.ERROR);
-        }
+        });
     }
+
 
     /**
      * Получает статус задачи от Worker'а.

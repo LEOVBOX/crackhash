@@ -33,6 +33,7 @@ public class TaskStatus {
             this.data.addAll(newData);
         }
         receivedParts++;
+        System.out.println("Task " + receivedParts + " / " + expectedParts);
         if (receivedParts >= expectedParts) {
             this.status = Status.READY.toString();
         }

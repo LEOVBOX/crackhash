@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -40,7 +41,10 @@ public class TaskStorageService {
 
     public boolean isTaskCompleted(String taskId) {
         TaskStatus taskStatus = tasks.get(taskId);
-        return taskStatus != null && "COMPLETED".equals(taskStatus.getStatus());
+        if (taskStatus != null  && Objects.equals(taskStatus.getStatus(), "READY")) {
+            return true;
+        }
+        return false;
     }
 
     public boolean addTaskData(String requestId, List<String> newData) {

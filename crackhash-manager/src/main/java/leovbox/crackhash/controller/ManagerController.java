@@ -46,7 +46,16 @@ public class ManagerController {
         String taskId = taskStorageService.createTask(taskCompletionService.getWorkersCount());
 
         // Запускаем выполнение задачи асинхронно
-        taskCompletionService.executeTaskAsync(taskId, crackRequest);
+        taskCompletionService.executeTaskAsync(taskId, crackRequest)
+                .thenAccept(result -> {
+                    // Обработка завершения задачи
+                    System.out.println("Task " + taskId + " completed");
+                })
+                .exceptionally(ex -> {
+                    // Обработка ошибок
+                    System.out.println("Task " + taskId + " failed: " + ex.getMessage());
+                    return null;
+                });
 
         // Возвращаем идентификатор задачи
         return ResponseEntity.ok(taskId);
