@@ -1,0 +1,60 @@
+services:
+  # Сервис менеджера
+  manager: 
+    image: crackhash_manager
+    container_name: manager
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_APPLICATION_JSON={"worker.urls":"http://worker1:8082,http://worker2:8082,http://worker3:8082,http://worker4:8082"}
+    networks:
+      - app-network
+
+  # Воркеры
+  worker1: 
+    image: crackhash_worker
+    container_name: worker1
+    environment:
+      - WORKER_ID=worker1
+      - MANAGER_URL=http://manager:8080
+    networks:
+      - app-network
+    depends_on:
+      - manager
+
+  worker2: 
+    image: crackhash_worker
+    container_name: worker2
+    environment:
+      - WORKER_ID=worker2
+      - MANAGER_URL=http://manager:8080
+    networks:
+      - app-network
+    depends_on:
+      - manager
+
+  worker3: 
+    image: crackhash_worker
+    container_name: worker3
+    environment:
+      - WORKER_ID=worker3
+      - MANAGER_URL=http://manager:8080
+    networks:
+      - app-network
+    depends_on:
+      - manager
+
+  worker4:
+    image: crackhash_worker
+    container_name: worker4
+    environment:
+      - WORKER_ID=worker4
+      - MANAGER_URL=http://manager:8080
+    networks:
+      - app-network
+    depends_on:
+      - manager
+
+networks:
+  app-network:
+    driver: bridge
